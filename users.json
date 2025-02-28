@@ -1,0 +1,33 @@
+{
+    "alex_j_mathes": {
+        "password": "admin123",
+        "age": 30,
+        "height": 180,
+        "weight": 75,
+        "blood_group": "O+",
+        "sessions": []
+    },
+    "john_doe": {
+        "password": "john123",
+        "age": 25,
+        "height": 175,
+        "weight": 70,
+        "blood_group": "A+",
+        "sessions": [
+            {
+                "date": "2023-10-01 14:30:00",
+                "count": 10,
+                "total_time": 25.5,
+                "average_speed": 2.55
+            }
+        ]
+    },
+    "student": {
+        "password": "ALEX",
+        "age": "21",
+        "height": "193",
+        "weight": "80",
+        "blood_group": "O+",
+        "sessions": []
+    }
+}
