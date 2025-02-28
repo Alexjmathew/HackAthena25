@@ -7,19 +7,19 @@ from datetime import datetime
 from pymongo import MongoClient
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Required for session management
+app.secret_key = 'your_secret_key'  
 
-# MongoDB setup
+
 client = MongoClient('mongodb://localhost:27017')
 db = client['MINI_PROJECT1']
 users_collection = db['ALEX']
 
-# Mediapipe and utility setup
+
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 mp_drawing = mp.solutions.drawing_utils
 
-# Global variables
+
 count = 0
 target_count = 0
 position = None
@@ -70,14 +70,12 @@ def generate_frames():
 
             angle = calculate_angle(*coords)
 
-            # PostureTraining counting and feedback logic
             if angle > exercise["target_angle"] + exercise["threshold"]:
                 position = "up"
             if position == "up" and angle < exercise["target_angle"] - exercise["threshold"]:
                 position = "down"
                 count += 1
 
-                # Calculate time for the repetition
                 current_time = time.time()
                 if last_rep_time:
                     rep_time = current_time - last_rep_time
@@ -93,27 +91,25 @@ def generate_frames():
                 if count == 1:
                     start_time = current_time
 
-            # Provide feedback based on angle
             if angle < exercise["target_angle"] - exercise["threshold"]:
                 feedback_message = "Lower your knee slightly"
             elif angle > exercise["target_angle"] + exercise["threshold"]:
                 feedback_message = "Raise your knee higher!"
 
-            # Draw feedback on the frame
+         
             cv2.putText(image, f'Angle: {int(angle)}', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
             cv2.putText(image, f'Count: {count}/{target_count}', (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             cv2.putText(image, feedback_message, (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
-            # Stop exercise if target count is reached
+        
             if count >= target_count:
                 exercise_started = False
                 total_time = time.time() - start_time if start_time else 0
                 feedback_message = f"PostureTraining Complete! Total time: {total_time:.2f}s"
                 cv2.putText(image, feedback_message, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                # Save session data
                 if 'username' in session:
                     session_data = {
                         "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -126,7 +122,6 @@ def generate_frames():
                         {"$push": {"sessions": session_data}}
                     )
 
-                # Reset global variables for the next session
                 start_time = None
                 last_rep_time = None
                 count = 0
@@ -139,7 +134,7 @@ def generate_frames():
 
     cap.release()
 
-# Routes
+
 @app.route('/')
 def index():
     if 'username' in session:
@@ -283,16 +278,16 @@ def select_exercise():
         if exercise_name == "knee_raises":
             exercise = {
                 "joints": ["LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"],
-                "target_angle": 60,  # Ideal angle for knee raised to hip level
+                "target_angle": 60,  
                 "threshold": 15,
-                "optimal_speed_range": (1.0, 2.5)  # Optimal time in seconds for one rep
+                "optimal_speed_range": (1.0, 2.5)  
             }
         elif exercise_name == "squats":
             exercise = {
                 "joints": ["LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"],
-                "target_angle": 90,  # Ideal angle for squat
+                "target_angle": 90,  
                 "threshold": 15,
-                "optimal_speed_range": (2.0, 4.0)  # Optimal time in seconds for one rep
+                "optimal_speed_range": (2.0, 4.0)  
             }
         return redirect(url_for('training'))
     return render_template('select_exercise.html')
